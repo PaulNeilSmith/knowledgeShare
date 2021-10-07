@@ -192,6 +192,36 @@ Use customerOrderRef to keep track of your bets from different models. It can be
 
 
 ---
+## Questions From Slack
+
+**Question:**
+Hi all. I'm it of a newbie with the API but I am trying to return my account statement / bets made / profit loss etc. I use tarbot to place bets but looking to retrieve all of my bets easier than looking online. I have followed the tutorial from the HUB https://betfair-datascientists.github.io/api/apiPythontutorial/ and in particular the getAccountStatement section. First of all is this the best way to go about getting results?
+When I try and exend the days out from four it still only returns the last 100 rows (bets and commission).
+have used this code:
+``` typescript
+
+daysago = (datetime.datetime.utcnow() - datetime.timedelta(days=50)).strftime("%Y-%m-%dT%TZ")
+acct_statement_date_filter = betfairlightweight.filters.time_range(from_=daysago)
+# Request account statement
+account_statement = trading.account.get_account_statement(item_date_range=acct_statement_date_filter)
+# Create df of recent transactions
+recent_transactions = pd.DataFrame(account_statement._data['accountStatement'])
+print(acct_statement_date_filter)
+display(recent_transactions) 
+
+```
+is there a limit on this function? thanks :pray:
+
+**Answer:**
+Yes. The APIs like this return data in pages. For this one 100 records max. but you can call it again and say start from record 101 to get another 100 and the response will have a moreAvailable field that is true if there are more pages to get.  You just make another call specifying fromRecord=101 and so on until you have it all. (Same kinda deal with listClearedOrders).
+
+**Question:**
+Hi all, Is there a way to find the final BSP price on a finished race through the API? I can get the BSP if I had an order on a horse with MARKET_ON_CLOSE, but I can't see how I would get this data if I had made the order with LIMIT (.e.g if I want to compare the BSP price to the price that I used in the original order)
+
+**Answer:**
+Call listMarketbook after the race has been settled. One note (if I remember correctly): when you call listMarketbook with closed markets, you need to make sure that all markets requested are closed. If one is open, you won't get the closed markets in the response.
+
+---
 ## Industry knowledge
 
 
